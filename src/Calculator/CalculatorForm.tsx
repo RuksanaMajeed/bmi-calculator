@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import {
@@ -7,9 +7,11 @@ import {
   Button,
   FormControlLabel,
   Slider,
+  Snackbar,
   Switch,
   Toolbar,
   Typography,
+  Alert,
 } from "@mui/material";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
@@ -17,6 +19,24 @@ import LightModeIcon from "@mui/icons-material/LightMode";
 
 const CalculatorForm: React.FC<IProps> = () => {
   const [isDark, setIsDark] = useState<boolean>(false);
+  const [weight, setWeight] = useState<number>(0);
+  const [height, setHeight] = useState<number>(0);
+  const [openSnackbar, setOpenSnackbar] = useState<boolean>(false); // State for Snackbar
+
+  const onSubmitClick = useCallback(() => {
+    if (weight === 0 || height === 0) {
+      // Show the Snackbar when the form is incomplete
+      setOpenSnackbar(true);
+    } else {
+      // Handle valid form submission
+      // Example: Calculate BMI or trigger other actions
+      setOpenSnackbar(false); // Optionally show Snackbar on valid submission
+    }
+  }, [weight, height]);
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false); // Close the Snackbar
+  };
 
   return (
     <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
@@ -84,21 +104,47 @@ const CalculatorForm: React.FC<IProps> = () => {
             <Typography variant="h6" align="left">
               Enter Height
             </Typography>
-            <Slider valueLabelDisplay="auto" max={300}/>
+            <Slider
+              valueLabelDisplay="auto"
+              max={300}
+              value={height}
+              onChange={(e, value) => setHeight(value as number)}
+            />
             <Typography variant="h6" align="left">
               Enter Weight
             </Typography>
-            <Slider valueLabelDisplay="auto" max={200}/>
+            <Slider
+              valueLabelDisplay="auto"
+              max={200}
+              value={weight}
+              onChange={(e, value) => setWeight(value as number)}
+            />
             <Button
               fullWidth
               variant="contained"
               color="primary"
               sx={{ mt: 2 }}
+              onClick={onSubmitClick}
             >
               Submit
             </Button>
           </Box>
         </Box>
+        {/* Snackbar for Toast Notification */}
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={3000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity="error"
+            sx={{ width: "100%" }}
+          >
+            Please fill in both fields.
+          </Alert>
+        </Snackbar>
       </Box>
     </ThemeProvider>
   );
